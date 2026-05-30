@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 
 // Camera barcode scanner. Decodes EAN-13 (book ISBN barcodes) and calls onDetected.
 // Requires HTTPS off-localhost — browsers block camera access otherwise.
@@ -12,8 +12,10 @@ export default function Scanner({ onDetected, onClose }) {
     let cancelled = false;
     const scanner = new Html5Qrcode(containerId, {
       formatsToSupport: [
-        // EAN_13 = 6, EAN_8 = 8, UPC_A = 11 (numeric codes from the html5-qrcode enum)
-        6, 8, 11,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
       ],
       verbose: false,
     });
@@ -22,7 +24,7 @@ export default function Scanner({ onDetected, onClose }) {
     scanner
       .start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 280, height: 160 } },
+        { fps: 15, qrbox: { width: 300, height: 150 } },
         (decoded) => {
           if (handledRef.current) return;
           handledRef.current = true;

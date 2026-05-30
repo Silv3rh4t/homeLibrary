@@ -2,5 +2,5 @@
 # giving you the HTTPS the browser camera API requires off-localhost.
 {$DOMAIN} {
 	encode gzip
-	reverse_proxy app:3000
+	reverse_proxy app:3100
 }
