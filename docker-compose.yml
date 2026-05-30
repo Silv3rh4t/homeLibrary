@@ -3,33 +3,12 @@ services:
     build: .
     restart: unless-stopped
     environment:
-      - PORT=3000
+      - PORT=3100
       - DATA_DIR=/app/data
       - ENABLE_AUTH=${ENABLE_AUTH:-false}
       - AUTH_USER=${AUTH_USER:-admin}
-      - AUTH_PASS=${AUTH_PASS:-}
+      - AUTH_PASS=${AUTH_PASS:-!n*p0--=+lk1!}
     volumes:
       - ./data:/app/data
     expose:
-      - "3000"
-
-  # Reverse proxy with automatic HTTPS (Let's Encrypt). Required for phone-camera scanning.
-  # Set DOMAIN in your environment, point its DNS at this host, then `docker compose up -d`.
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    depends_on:
-      - app
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      - DOMAIN=${DOMAIN:?set DOMAIN to your hostname}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-
-volumes:
-  caddy_data:
-  caddy_config:
+      - "3100"
