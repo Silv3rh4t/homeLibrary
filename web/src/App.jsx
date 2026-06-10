@@ -3,9 +3,13 @@ import BookList from './components/BookList.jsx';
 import BookForm from './components/BookForm.jsx';
 import BookDetail from './components/BookDetail.jsx';
 import Scanner from './components/Scanner.jsx';
+import LoginPage from './components/LoginPage.jsx';
 import * as api from './api.js';
 
 export default function App() {
+  // null = checking, false = not authed, true = authed
+  const [authed, setAuthed] = useState(null);
+
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ q: '', status: 'all', lent: false, sort: 'added' });
@@ -14,6 +18,20 @@ export default function App() {
   //                { mode:'detail', book }
   const [overlay, setOverlay] = useState(null);
   const [saving, setSaving] = useState(false);
+
+  // ---- Auth check on mount ----
+  useEffect(() => {
+    api.checkAuth()
+      .then(() => setAuthed(true))
+      .catch(() => setAuthed(false));
+  }, []);
+
+  const handleLogin = () => setAuthed(true);
+
+  const handleLogout = async () => {
+    await api.logout().catch(() => {});
+    setAuthed(false);
+  };
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -26,6 +44,7 @@ export default function App() {
       };
       setBooks(await api.listBooks(params));
     } catch (e) {
+      if (e.status === 401) { setAuthed(false); return; }
       console.error(e);
     } finally {
       setLoading(false);
@@ -33,9 +52,10 @@ export default function App() {
   }, [filters]);
 
   useEffect(() => {
+    if (!authed) return;
     const t = setTimeout(refresh, 200); // debounce search typing
     return () => clearTimeout(t);
-  }, [refresh]);
+  }, [refresh, authed]);
 
   const updateFilters = (patch) => setFilters((f) => ({ ...f, ...patch }));
 
@@ -85,11 +105,21 @@ export default function App() {
     refresh();
   };
 
+  // ---- Render ----
+  if (authed === null) {
+    return <div className="app-loading">Loading…</div>;
+  }
+
+  if (authed === false) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>📚 HomeLibrary</h1>
         <span className="count">{books.length} books</span>
+        <button className="btn-ghost logout-btn" onClick={handleLogout}>Sign out</button>
       </header>
 
       <BookList

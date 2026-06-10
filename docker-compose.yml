@@ -5,6 +5,7 @@ services:
     environment:
       - PORT=3100
       - DATA_DIR=/app/data
+      - NODE_ENV=production
       - ENABLE_AUTH=${ENABLE_AUTH:-false}
       - AUTH_USER=${AUTH_USER:-admin}
       - AUTH_PASS=${AUTH_PASS}
